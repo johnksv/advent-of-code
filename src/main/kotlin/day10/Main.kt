@@ -11,11 +11,11 @@ fun main() {
     println(task1(cycleListTask1, 20, 60, 100, 140, 180, 220))
 //    println(task1And2(taskInput, 4))
 //
-//    print("Test input Task 2: ")
-//    println(task1And2(testInput, 14))
+    println("Test input Task 2: ")
+    println(task2(testCycleList))
 //
-//    print("Task 2: ")
-//    println(task1And2(taskInput, 14))
+    println("Task 2: ")
+    println(task2(cycleListTask1))
 }
 
 
@@ -23,18 +23,18 @@ data class Cycle(val during: Int, val after: Int)
 
 fun cycleList(input: List<String>): MutableList<Cycle> {
     val initialX = 1
-    val cycleList = mutableListOf(Cycle(initialX, initialX))
+    val cycleList = mutableListOf<Cycle>()
     input.forEach { instruction ->
         // two instruciton, noop or addx
         when (instruction) {
             "noop" -> {
-                val afterLastCyleValue = cycleList.last().after
+                val afterLastCyleValue = if (cycleList.isNotEmpty())  cycleList.last().after else initialX
                 cycleList.add(Cycle(afterLastCyleValue, afterLastCyleValue))
             }
 
             else -> {
                 val value = instruction.removePrefix("addx ").toInt()
-                val afterLastCyleValue = cycleList.last().after
+                val afterLastCyleValue = if (cycleList.isNotEmpty())  cycleList.last().after else initialX
                 cycleList.add(Cycle(afterLastCyleValue, afterLastCyleValue))
                 cycleList.add(Cycle(afterLastCyleValue, afterLastCyleValue + value))
             }
@@ -45,9 +45,25 @@ fun cycleList(input: List<String>): MutableList<Cycle> {
 
 fun task1(cycleList: List<Cycle>, vararg cycleNumbers: Int) =
     cycleList
-        .filterIndexed() { index, _ -> cycleNumbers.contains(index ) }
+        .filterIndexed() { index, _ -> cycleNumbers.contains(index + 1) }
         .mapIndexed { index, cycle ->
             println("$index, ${cycle.during},  ${cycleNumbers[index]}")
             cycle.during * cycleNumbers[index]
         }
         .sum()
+
+fun task2(cycleList: List<Cycle>) {
+    val rows = cycleList.chunked(40)
+    for (row in rows) {
+        row.forEachIndexed { crtPosition, cycle ->
+            if ((cycle.during - 1..cycle.during + 1).contains(crtPosition)) {
+                print("#")
+            } else {
+                print(".")
+            }
+        }
+        println("")
+    }
+
+
+}
